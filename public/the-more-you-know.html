@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The More You Know</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    background: #06060f;
+    color: rgba(255,255,255,0.85);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px;
+    background-image: radial-gradient(ellipse at 70% 20%, rgba(255,0,0,0.05) 0%, transparent 60%),
+                      radial-gradient(ellipse at 30% 80%, rgba(255,165,0,0.04) 0%, transparent 60%);
+  }
+  .card {
+    max-width: 640px;
+    width: 100%;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 24px;
+    padding: 56px 48px;
+    backdrop-filter: blur(12px);
+  }
+  .badge {
+    display: inline-block;
+    font-size: 0.6rem;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: #FF6B4A;
+    border: 1px solid rgba(255,107,74,0.2);
+    border-radius: 20px;
+    padding: 4px 14px;
+    margin-bottom: 20px;
+    font-weight: 600;
+  }
+  h1 {
+    font-size: 2.2rem;
+    font-weight: 300;
+    letter-spacing: 2px;
+    margin-bottom: 24px;
+    color: #fff;
+  }
+  .fact {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 20px;
+    padding: 16px 20px;
+    background: rgba(255,255,255,0.02);
+    border: 1px solid rgba(255,255,255,0.04);
+    border-radius: 12px;
+    transition: background 0.3s;
+  }
+  .fact:hover {
+    background: rgba(255,255,255,0.04);
+  }
+  .fact-icon {
+    font-size: 1.4rem;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+  .fact-content h3 {
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: rgba(255,255,255,0.8);
+    margin-bottom: 4px;
+    letter-spacing: 0.5px;
+  }
+  .fact-content p {
+    font-size: 0.8rem;
+    line-height: 1.6;
+    color: rgba(255,255,255,0.4);
+  }
+</style>
+</head>
+<body>
+  <div class="card">
+    <div class="badge">The More You Know</div>
+    <h1>Curious</h1> <span style="color:#FF6B4A;">facts</span></h1>
+    <div class="fact">
+      <div class="fact-icon">🌍</div>
+      <div class="fact-content">
+        <h3>Earth's</h3> rotation is slowing</h3>
+        <p>Every century</p>, Earth's rotation adds about 1.8 milliseconds to a day. In 140 million years, a day will be 25 hours long.</p>
+      </div>
+    </div>
+    <div class="fact">
+      <div class="fact-icon">🌌</div>
+      <div class="fact-content">
+        <h3>There are more stars than grains</h3> of sand</h3>
+        <p>Estimates suggest there</p> are 100-200 billion galaxies in the observable universe, each with millions to billions of stars.</p>
+      </div>
+    </div>
+    <div class="fact">
+      <div class="fact-icon">🧠</div>
+      <div class="fact-content">
+        <h3>Your brain generates enough</h3> electricity to power a lightbulb</h3>
+        <p>The 86 billion neurons in your brain produce about 20 watts of electrical power — enough to light a small LED bulb.</p>
+      </div>
+    </div>
+    <div class="fact">
+      <div class="fact-icon">🌱</div>
+      <div class="fact-content">
+        <h3>Trees communicate underground</h3>
+        <p>Through networks of fungi</p> called the "Wood Wide Web," trees share nutrients, send warnings, and support each other.</p>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

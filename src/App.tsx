@@ -1,9 +1,14 @@
-import Globe from "./globe"; // Adjust the path if your Globe file is in a different folder
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import Globe from "./globe";
+import ExploreWorld from "./ExploreWorld";
 
 export default function App() {
-	return (
-		<div style={{ margin: 0, padding: 0, backgroundColor: "#060612" }}>
-			<Globe />
-		</div>
-	);
+  return (
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<Globe />} />
+        <Route path="/explore-world" element={<ExploreWorld />} />
+      </Routes>
+    </BrowserRouter>
+  );
 }
