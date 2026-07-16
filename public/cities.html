@@ -1,0 +1,785 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Urban Tomorrow | Sustainable Development Awareness</title>
+    <style>
+      :root {
+        --bg-dark: #0f172a;
+        --card-bg: #1e293b;
+        --accent-green: #10b981;
+        --accent-glow: rgba(16, 185, 129, 0.2);
+        --accent-warn: #f59e0b;
+        --text-main: #f8fafc;
+        --text-muted: #94a3b8;
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      }
+
+      body {
+        background-color: var(--bg-dark);
+        color: var(--text-main);
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: flex-start;
+        overflow-x: hidden;
+        position: relative;
+        padding-bottom: 5rem;
+      }
+
+      /* Interactive Canvas Background */
+      #bg-canvas {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 1;
+        pointer-events: none;
+      }
+
+      .container {
+        position: relative;
+        z-index: 2;
+        width: 100%;
+        max-width: 1100px;
+        padding: 2rem;
+        text-align: center;
+        margin-top: 3rem;
+      }
+
+      header h1 {
+        font-size: 3rem;
+        font-weight: 800;
+        margin-bottom: 0.75rem;
+        background: linear-gradient(to right, #ffffff, var(--accent-green));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        letter-spacing: -0.5px;
+      }
+
+      header p {
+        color: var(--text-muted);
+        font-size: 1.2rem;
+        max-width: 700px;
+        margin: 0 auto 4rem;
+        line-height: 1.6;
+      }
+
+      /* Interactive Dashboard & Quiz Container */
+      .dashboard-section {
+        background: var(--card-bg);
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        border-radius: 24px;
+        padding: 2.5rem;
+        margin-bottom: 4rem;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+        text-align: left;
+      }
+
+      .dashboard-title {
+        font-size: 1.5rem;
+        font-weight: 700;
+        margin-bottom: 1.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+
+      .selector-tabs {
+        display: flex;
+        gap: 1rem;
+        margin-bottom: 2rem;
+        border-bottom: 2px solid #334155;
+        padding-bottom: 1rem;
+      }
+
+      .tab-btn {
+        background: none;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        color: var(--text-muted);
+        padding: 0.6rem 1.5rem;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+      }
+
+      .tab-btn.active {
+        background: var(--accent-green);
+        color: var(--bg-dark);
+        border-color: var(--accent-green);
+      }
+
+      .display-panel {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 2.5rem;
+        align-items: center;
+      }
+
+      @media (max-width: 768px) {
+        .display-panel {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      .metrics-title {
+        font-size: 1.8rem;
+        margin-bottom: 1rem;
+        color: #ffffff;
+      }
+
+      .metrics-desc {
+        color: var(--text-muted);
+        line-height: 1.6;
+        margin-bottom: 1.5rem;
+      }
+
+      /* Data Visualization Meter */
+      .data-visual {
+        background: rgba(15, 23, 42, 0.6);
+        padding: 2rem;
+        border-radius: 16px;
+        border: 1px solid rgba(255, 255, 255, 0.05);
+      }
+
+      .meter-label {
+        display: flex;
+        justify-content: space-between;
+        font-size: 0.9rem;
+        margin-bottom: 0.5rem;
+        color: var(--text-muted);
+      }
+
+      .meter-track {
+        height: 12px;
+        background: #334155;
+        border-radius: 6px;
+        overflow: hidden;
+        margin-bottom: 1.5rem;
+      }
+
+      .meter-fill {
+        height: 100%;
+        background: var(--accent-warn);
+        width: 0%;
+        transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+
+      /* Pillars Grid */
+      .grid-heading {
+        font-size: 2rem;
+        font-weight: 700;
+        margin-bottom: 2rem;
+      }
+
+      .pillars-grid {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 2.5rem;
+        margin-bottom: 4rem;
+      }
+
+      /* Interactive 3D Cards */
+      .card-wrapper {
+        perspective: 1000px;
+      }
+
+      .pillar-card {
+        background: var(--card-bg);
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        border-radius: 20px;
+        width: 340px;
+        padding: 2.5rem 2rem;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        transform-style: preserve-3d;
+        transition:
+          transform 0.1s ease,
+          box-shadow 0.3s ease,
+          border-color 0.3s ease;
+        text-align: left;
+        height: 100%;
+      }
+
+      .pillar-card:hover {
+        box-shadow: 0 0 30px var(--accent-glow);
+        border-color: var(--accent-green);
+      }
+
+      .card-icon {
+        width: 50px;
+        height: 50px;
+        border-radius: 12px;
+        background: rgba(16, 185, 129, 0.1);
+        color: var(--accent-green);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        font-weight: bold;
+        margin-bottom: 1.5rem;
+        transform: translateZ(30px);
+        border: 1px solid rgba(16, 185, 129, 0.2);
+      }
+
+      .card-title {
+        font-size: 1.4rem;
+        font-weight: 700;
+        margin-bottom: 1rem;
+        color: #ffffff;
+        transform: translateZ(25px);
+      }
+
+      .card-body {
+        color: var(--text-muted);
+        font-size: 0.95rem;
+        line-height: 1.6;
+        transform: translateZ(15px);
+      }
+
+      /* Quiz Styling */
+      .quiz-section {
+        margin-top: 2rem;
+      }
+
+      .quiz-progress-bar {
+        height: 4px;
+        background: #334155;
+        border-radius: 2px;
+        overflow: hidden;
+        margin-bottom: 0.5rem;
+      }
+
+      .quiz-progress-fill {
+        height: 100%;
+        background: var(--accent-green);
+        width: 0%;
+        transition: width 0.4s ease;
+      }
+
+      .quiz-options-grid {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+      }
+
+      .option-btn {
+        background: rgba(15, 23, 42, 0.4);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        color: var(--text-main);
+        padding: 1rem 1.5rem;
+        border-radius: 12px;
+        text-align: left;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: all 0.25s ease;
+        width: 100%;
+      }
+
+      .option-btn:hover:not([disabled]) {
+        border-color: var(--accent-green);
+        background: rgba(16, 185, 129, 0.05);
+        transform: translateX(4px);
+      }
+
+      .option-btn.correct {
+        background: rgba(16, 185, 129, 0.15) !important;
+        border-color: var(--accent-green) !important;
+        color: #ffffff;
+      }
+
+      .option-btn.wrong {
+        background: rgba(239, 68, 68, 0.15) !important;
+        border-color: #ef4444 !important;
+        color: #ffffff;
+      }
+    </style>
+  </head>
+  <body>
+    <canvas id="bg-canvas"></canvas>
+
+    <div class="container">
+      <header>
+        <h1>The Cost of Carelessness</h1>
+        <p>
+          Modern cities occupy just 3% of the Earth's land, yet account for
+          60-80% of energy consumption and 75% of carbon emissions. True
+          sustainability begins when urban convenience shifts to conscious
+          preservation.
+        </p>
+      </header>
+
+      <!-- Interactive Dynamic Insight Dashboard -->
+      <div class="dashboard-section">
+        <div class="dashboard-title">
+          <span>⚡</span> Urban Diagnostic Simulator
+        </div>
+
+        <div class="selector-tabs">
+          <button class="tab-btn active" onclick="switchMetric('energy', this)">
+            Concrete Heat Islands
+          </button>
+          <button class="tab-btn" onclick="switchMetric('waste', this)">
+            The Linear Waste Crisis
+          </button>
+          <button class="tab-btn" onclick="switchMetric('water', this)">
+            Aquifer Depletion
+          </button>
+        </div>
+
+        <div class="display-panel">
+          <div>
+            <h3 class="metrics-title" id="panel-title">
+              Concrete Heat Islands
+            </h3>
+            <p class="metrics-desc" id="panel-desc">
+              Glass facades and infinite asphalt pathways absorb solar radiation
+              instead of reflecting it. Leaving air conditioners running
+              continuously creates an artificial thermal cycle, raising
+              structural ambient temperatures inside cities by up to 10°C
+              compared to rural surroundings.
+            </p>
+          </div>
+          <div class="data-visual">
+            <div class="meter-label">
+              <span>Urban Risk Quotient</span>
+              <span id="risk-val">82%</span>
+            </div>
+            <div class="meter-track">
+              <div class="meter-fill" id="risk-fill" style="width: 82%"></div>
+            </div>
+
+            <div class="meter-label">
+              <span>Depletion Accelerator Rate</span>
+              <span id="rate-val">68%</span>
+            </div>
+            <div class="meter-track">
+              <div class="meter-fill" id="rate-fill" style="width: 68%"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Pillars Breakdown Grid -->
+      <h2 class="grid-heading">Architectural Realities We Ignore</h2>
+      <div class="pillars-grid">
+        <!-- Card 1 -->
+        <div class="card-wrapper">
+          <div class="pillar-card">
+            <div class="card-icon">01</div>
+            <h3 class="card-title">Hyper-Consumption</h3>
+            <p class="card-body">
+              Fast fashion, planned obsolescence, and instant delivery networks
+              mask the high infrastructural footprints required to fulfill
+              day-to-day urban desires. Resource usage far outpaces natural
+              standard generation limits.
+            </p>
+          </div>
+        </div>
+
+        <!-- Card 2 -->
+        <div class="card-wrapper">
+          <div class="pillar-card">
+            <div class="card-icon">02</div>
+            <h3 class="card-title">Vanishing Green Spaces</h3>
+            <p class="card-body">
+              Wetlands, local swamps, and urban canopies are routinely clear-cut
+              to make way for high-rise extensions, completely compromising
+              inherent local biodiversity and natural localized flood protection
+              mechanisms.
+            </p>
+          </div>
+        </div>
+
+        <!-- Card 3 -->
+        <div class="card-wrapper">
+          <div class="pillar-card">
+            <div class="card-icon">03</div>
+            <h3 class="card-title">Systemic Apathy</h3>
+            <p class="card-body">
+              We prioritize seamless individual systemic convenience over
+              cyclical accountability, treating garbage cleanup, clean water
+              distribution, and energy grids as infinite resources until local
+              allocation caps break completely.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Interactive Sustainability Quiz Section -->
+      <div class="dashboard-section quiz-section">
+        <div class="dashboard-title">
+          <span>🌱</span> Urban Footprint Challenge
+        </div>
+
+        <div id="quiz-intro">
+          <p class="metrics-desc">
+            Test your perspective on how city planning choices shape global
+            ecology. See if you can identify structural carelessness before it
+            becomes irreversible.
+          </p>
+          <button
+            class="tab-btn active"
+            style="margin-top: 1rem"
+            onclick="startQuiz()"
+          >
+            Begin Assessment
+          </button>
+        </div>
+
+        <div id="quiz-container" style="display: none">
+          <div class="quiz-progress-bar">
+            <div class="quiz-progress-fill" id="quiz-progress"></div>
+          </div>
+          <div class="meter-label" style="margin-bottom: 1.5rem">
+            <span id="question-number">Question 1 of 4</span>
+            <span id="current-score">Score: 0</span>
+          </div>
+
+          <h3
+            class="metrics-title"
+            id="quiz-question"
+            style="font-size: 1.4rem; margin-bottom: 1.5rem"
+          >
+            Loading question text...
+          </h3>
+
+          <div class="quiz-options-grid" id="quiz-options">
+            <!-- Options generated dynamically by script -->
+          </div>
+
+          <button
+            class="tab-btn active"
+            id="next-btn"
+            style="margin-top: 1.5rem; display: none"
+            onclick="nextQuestion()"
+          >
+            Next Question
+          </button>
+        </div>
+
+        <div
+          id="quiz-results"
+          style="display: none; text-align: center; padding: 1.5rem 0"
+        >
+          <h3
+            class="metrics-title"
+            style="font-size: 2rem; color: var(--accent-green)"
+          >
+            Assessment Complete
+          </h3>
+          <p
+            class="metrics-desc"
+            id="results-feedback"
+            style="margin: 1rem auto 2rem; max-width: 600px"
+          ></p>
+          <button class="tab-btn active" onclick="resetQuiz()">
+            Retake Challenge
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      /* --- Data Library for Interactive Dashboard --- */
+      const datasets = {
+        energy: {
+          title: "Concrete Heat Islands",
+          desc: "Glass facades and infinite asphalt pathways absorb solar radiation instead of reflecting it. Leaving air conditioners running continuously creates an artificial thermal cycle, raising structural ambient temperatures inside cities by up to 10°C compared to rural surroundings.",
+          risk: "82%",
+          rate: "68%",
+        },
+        waste: {
+          title: "The Linear Waste Crisis",
+          desc: "Modern metropolitan sectors dump thousands of tons of unsegregated organic material and complex plastics straight into peripheral landfills daily. Single-use culture operates entirely on an extractive, terminal scale with close to zero circular regeneration.",
+          risk: "94%",
+          rate: "85%",
+        },
+        water: {
+          title: "Aquifer Depletion",
+          desc: "Concrete shielding blocks surface soil absorption, preventing rainwater systems from replenishing local groundwater levels. Deep tube-wells pull millions of liters daily, running high-pressure infrastructure toward permanent systemic collapse.",
+          risk: "76%",
+          rate: "91%",
+        },
+      };
+
+      function switchMetric(key, element) {
+        document
+          .querySelectorAll(".tab-btn")
+          .forEach((btn) => btn.classList.remove("active"));
+        element.classList.add("active");
+
+        document.getElementById("panel-title").innerText = datasets[key].title;
+        document.getElementById("panel-desc").innerText = datasets[key].desc;
+
+        document.getElementById("risk-val").innerText = datasets[key].risk;
+        document.getElementById("rate-val").innerText = datasets[key].rate;
+
+        document.getElementById("risk-fill").style.width = datasets[key].risk;
+        document.getElementById("rate-fill").style.width = datasets[key].rate;
+      }
+
+      /* --- Interaction 1: Dynamic Particle Background --- */
+      const canvas = document.getElementById("bg-canvas");
+      const ctx = canvas.getContext("2d");
+
+      let width = (canvas.width = window.innerWidth);
+      let height = (canvas.height = window.innerHeight);
+
+      const particles = [];
+      const mouse = { x: null, y: null, radius: 160 };
+
+      window.addEventListener("resize", () => {
+        width = canvas.width = window.innerWidth;
+        height = canvas.height = window.innerHeight;
+      });
+
+      window.addEventListener("mousemove", (e) => {
+        mouse.x = e.clientX;
+        mouse.y = e.clientY;
+      });
+
+      window.addEventListener("mouseleave", () => {
+        mouse.x = null;
+        mouse.y = null;
+      });
+
+      class Particle {
+        constructor() {
+          this.x = Math.random() * width;
+          this.y = Math.random() * height;
+          this.vx = (Math.random() - 0.5) * 0.5;
+          this.vy = (Math.random() - 0.5) * 0.5;
+          this.radius = Math.random() * 2 + 1;
+        }
+        update() {
+          this.x += this.vx;
+          this.y += this.vy;
+
+          if (this.x < 0 || this.x > width) this.vx *= -1;
+          if (this.y < 0 || this.y > height) this.vy *= -1;
+
+          if (mouse.x && mouse.y) {
+            const dx = mouse.x - this.x;
+            const dy = mouse.y - this.y;
+            const dist = Math.sqrt(dx * dx + dy * dy);
+            if (dist < mouse.radius) {
+              const force = (mouse.radius - dist) / mouse.radius;
+              this.x -= (dx / dist) * force * 2.5;
+              this.y -= (dy / dist) * force * 2.5;
+            }
+          }
+        }
+        draw() {
+          ctx.beginPath();
+          ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+          ctx.fillStyle = "rgba(16, 185, 129, 0.2)";
+          ctx.fill();
+        }
+      }
+
+      for (let i = 0; i < 80; i++) {
+        particles.push(new Particle());
+      }
+
+      function animate() {
+        ctx.clearRect(0, 0, width, height);
+        particles.forEach((p) => {
+          p.update();
+          p.draw();
+        });
+
+        for (let i = 0; i < particles.length; i++) {
+          for (let j = i + 1; j < particles.length; j++) {
+            const dx = particles[i].x - particles[j].x;
+            const dy = particles[i].y - particles[j].y;
+            const dist = Math.sqrt(dx * dx + dy * dy);
+            if (dist < 110) {
+              ctx.beginPath();
+              ctx.moveTo(particles[i].x, particles[i].y);
+              ctx.lineTo(particles[j].x, particles[j].y);
+              ctx.strokeStyle = `rgba(16, 185, 129, ${0.12 * (1 - dist / 110)})`;
+              ctx.lineWidth = 0.7;
+              ctx.stroke();
+            }
+          }
+        }
+        requestAnimationFrame(animate);
+      }
+      animate();
+
+      /* --- Interaction 2: 3D Tilt Effect on Grid Cards --- */
+      const cards = document.querySelectorAll(".pillar-card");
+      cards.forEach((card) => {
+        card.addEventListener("mousemove", (e) => {
+          const rect = card.getBoundingClientRect();
+          const x = e.clientX - rect.left - rect.width / 2;
+          const y = e.clientY - rect.top - rect.height / 2;
+
+          const rotateX = -(y / rect.height) * 12;
+          const rotateY = (x / rect.width) * 12;
+
+          card.style.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+        });
+
+        card.addEventListener("mouseleave", () => {
+          card.style.transform = "rotateX(0deg) rotateY(0deg)";
+        });
+      });
+
+      /* --- Interaction 3: Sustainability Quiz Engine --- */
+      const quizData = [
+        {
+          question:
+            "Which urban choice is the primary driver behind localized 'Concrete Heat Islands'?",
+          options: [
+            "High density human populations walking inside market districts.",
+            "Expansive asphalt surfaces and glass facades absorbing/trapping solar heat.",
+            "Domestic home electronics running simultaneously in suburbs.",
+            "Air ventilation shafts routing basement carbon exhaust upwards.",
+          ],
+          correct: 1,
+        },
+        {
+          question:
+            "Why does deep rainwater fail to effectively replenish aquifers underneath large cities?",
+          options: [
+            "Paved infrastructure acts as an absolute seal blocking ground absorption.",
+            "Evaporation acceleration values are too fast due to industrial machinery.",
+            "Local drainage pipelines automatically treat all rainwater with industrial acids.",
+            "Urban micro-climates completely prevent atmospheric condensation.",
+          ],
+          correct: 0,
+        },
+        {
+          question:
+            "What percentage of global greenhouse emissions are modern metropolitan hubs directly responsible for?",
+          options: [
+            "Approximately 10-15%",
+            "Around 35-40%",
+            "Close to 75%",
+            "Varies wildly between 95% and 98%",
+          ],
+          correct: 2,
+        },
+        {
+          question:
+            "What structural model solves the 'Linear Waste Crisis' typical of careless city supply chains?",
+          options: [
+            "Expanding peripheral landfill depths further away from standard grid coordinates.",
+            "A Circular Economy built on structural component reuse and strict organic allocation.",
+            "Incinerating unsegregated packaging waste inside modern high-temp containment loops.",
+            "Shifting baseline manufacturing dependencies over to alternative single-use materials.",
+          ],
+          correct: 1,
+        },
+      ];
+
+      let currentQuestionIndex = 0;
+      let userScore = 0;
+      let hasAnswered = false;
+
+      function startQuiz() {
+        document.getElementById("quiz-intro").style.display = "none";
+        document.getElementById("quiz-container").style.display = "block";
+        loadQuestion();
+      }
+
+      function loadQuestion() {
+        hasAnswered = false;
+        document.getElementById("next-btn").style.display = "none";
+
+        const currentData = quizData[currentQuestionIndex];
+
+        const progressPercent = (currentQuestionIndex / quizData.length) * 100;
+        document.getElementById("quiz-progress").style.width =
+          progressPercent + "%";
+        document.getElementById("question-number").innerText =
+          `Question ${currentQuestionIndex + 1} of ${quizData.length}`;
+
+        document.getElementById("quiz-question").innerText =
+          currentData.question;
+
+        const optionsContainer = document.getElementById("quiz-options");
+        optionsContainer.innerHTML = "";
+
+        currentData.options.forEach((opt, idx) => {
+          const btn = document.createElement("button");
+          btn.className = "option-btn";
+          btn.innerText = opt;
+          btn.onclick = () => selectOption(btn, idx);
+          optionsContainer.appendChild(btn);
+        });
+      }
+
+      function selectOption(selectedBtn, chosenIdx) {
+        if (hasAnswered) return;
+        hasAnswered = true;
+
+        const currentData = quizData[currentQuestionIndex];
+        const allBtns = document.querySelectorAll(".option-btn");
+
+        allBtns.forEach((btn) => btn.setAttribute("disabled", "true"));
+
+        if (chosenIdx === currentData.correct) {
+          selectedBtn.classList.add("correct");
+          userScore++;
+          document.getElementById("current-score").innerText =
+            `Score: ${userScore}`;
+        } else {
+          selectedBtn.classList.add("wrong");
+          allBtns[currentData.correct].classList.add("correct");
+        }
+
+        document.getElementById("next-btn").style.display = "inline-block";
+      }
+
+      function nextQuestion() {
+        currentQuestionIndex++;
+        if (currentQuestionIndex < quizData.length) {
+          loadQuestion();
+        } else {
+          showResults();
+        }
+      }
+
+      function showResults() {
+        document.getElementById("quiz-container").style.display = "none";
+        const resultsDiv = document.getElementById("quiz-results");
+        resultsDiv.style.display = "block";
+
+        const percentage = (userScore / quizData.length) * 100;
+        let assessmentMessage = "";
+
+        if (percentage === 100) {
+          assessmentMessage = `Perfect Score (${userScore}/${quizData.length})! You possess an exceptional eye for architectural accountability and structural ecological needs.`;
+        } else if (percentage >= 75) {
+          assessmentMessage = `Great Job (${userScore}/${quizData.length})! You clearly understand the core issues behind urban apathy.`;
+        } else {
+          assessmentMessage = `Score: ${userScore}/${quizData.length}. A great foundation, but there is always room to improve structural awareness. Review the Diagnostic Simulator blocks above to scan infrastructure vulnerabilities.`;
+        }
+
+        document.getElementById("results-feedback").innerText =
+          assessmentMessage;
+      }
+
+      function resetQuiz() {
+        currentQuestionIndex = 0;
+        userScore = 0;
+        document.getElementById("current-score").innerText = "Score: 0";
+        document.getElementById("quiz-results").style.display = "none";
+        document.getElementById("quiz-intro").style.display = "block";
+      }
+    </script>
+  </body>
+</html>

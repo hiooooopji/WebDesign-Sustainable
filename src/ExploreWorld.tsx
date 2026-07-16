@@ -7,9 +7,9 @@ import {
 } from "three/addons/renderers/CSS3DRenderer.js";
 
 const screenData = [
-  { label: "About Us", url: "/about-us.html" },
-  { label: "The More You Know", url: "/the-more-you-know.html" },
-  { label: "What Can You Do", url: "/what-can-you-do.html" },
+  { label: "About Us", url: "/cities.html" },
+  { label: "The More You Know", url: "/aboutus.html" },
+  { label: "What Can You Do", url: "/what.html" },
 ];
 
 export default function ExploreWorld() {

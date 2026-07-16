@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Urban Tomorrow | Act Now</title>
+	<style>
+		:root {
+			--bg-dark: #0f172a;
+			--card-bg: #1e293b;
+			--accent-green: #10b981;
+			--accent-glow: rgba(16, 185, 129, 0.2);
+			--accent-blue: #3b82f6;
+			--text-main: #f8fafc;
+			--text-muted: #94a3b8;
+		}
+
+		* {
+			margin: 0;
+			padding: 0;
+			box-sizing: border-box;
+			font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+		}
+
+		body {
+			background-color: var(--bg-dark);
+			color: var(--text-main);
+			min-height: 100vh;
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			justify-content: flex-start;
+			overflow-x: hidden;
+			position: relative;
+			padding-bottom: 5rem;
+		}
+
+		/* Interactive Canvas Background */
+		#bg-canvas {
+			position: fixed;
+			top: 0;
+			left: 0;
+			width: 100%;
+			height: 100%;
+			z-index: 1;
+			pointer-events: none;
+		}
+
+		.container {
+			position: relative;
+			z-index: 2;
+			width: 100%;
+			max-width: 1100px;
+			padding: 2rem;
+			text-align: center;
+			margin-top: 3rem;
+		}
+
+		header h1 {
+			font-size: 3rem;
+			font-weight: 800;
+			margin-bottom: 0.75rem;
+			background: linear-gradient(to right, #ffffff, var(--accent-green));
+			-webkit-background-clip: text;
+			-webkit-text-fill-color: transparent;
+			letter-spacing: -0.5px;
+		}
+
+		header p {
+			color: var(--text-muted);
+			font-size: 1.2rem;
+			max-width: 700px;
+			margin: 0 auto 4rem;
+			line-height: 1.6;
+		}
+
+		/* Interactive Dashboard Section */
+		.dashboard-section {
+			background: var(--card-bg);
+			border: 1px solid rgba(255, 255, 255, 0.05);
+			border-radius: 24px;
+			padding: 2.5rem;
+			margin-bottom: 4rem;
+			box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+			text-align: left;
+		}
+
+		.dashboard-title {
+			font-size: 1.5rem;
+			font-weight: 700;
+			margin-bottom: 1.5rem;
+			display: flex;
+			align-items: center;
+			gap: 0.5rem;
+		}
+
+		.calculator-grid {
+			display: grid;
+			grid-template-columns: 1.2fr 0.8fr;
+			gap: 2.5rem;
+			align-items: center;
+		}
+
+		@media (max-width: 768px) {
+			.calculator-grid {
+				grid-template-columns: 1fr;
+			}
+		}
+
+		.metrics-title {
+			font-size: 1.8rem;
+			margin-bottom: 1rem;
+			color: #ffffff;
+		}
+
+		.metrics-desc {
+			color: var(--text-muted);
+			line-height: 1.6;
+			margin-bottom: 2rem;
+		}
+
+		/* Toggle Box Styles */
+		.toggle-container {
+			display: flex;
+			flex-direction: column;
+			gap: 1.2rem;
+		}
+
+		.toggle-row {
+			display: flex;
+			align-items: center;
+			justify-content: space-between;
+			background: rgba(15, 23, 42, 0.4);
+			padding: 1rem 1.5rem;
+			border-radius: 12px;
+			border: 1px solid rgba(255, 255, 255, 0.05);
+		}
+
+		.toggle-label h4 {
+			font-size: 1.05rem;
+			color: #ffffff;
+			margin-bottom: 0.25rem;
+		}
+
+		.toggle-label p {
+			font-size: 0.85rem;
+			color: var(--text-muted);
+		}
+
+		/* Custom Switch CSS */
+		.switch {
+			position: relative;
+			display: inline-block;
+			width: 50px;
+			height: 26px;
+		}
+
+		.switch input {
+			opacity: 0;
+			width: 0;
+			height: 0;
+		}
+
+		.slider {
+			position: absolute;
+			cursor: pointer;
+			top: 0;
+			left: 0;
+			right: 0;
+			bottom: 0;
+			background-color: #334155;
+			transition: .3s;
+			border-radius: 34px;
+		}
+
+		.slider:before {
+			position: absolute;
+			content: "";
+			height: 18px;
+			width: 18px;
+			left: 4px;
+			bottom: 4px;
+			background-color: white;
+			transition: .3s;
+			border-radius: 50%;
+		}
+
+		input:checked + .slider {
+			background-color: var(--accent-green);
+		}
+
+		input:checked + .slider:before {
+			transform: translateX(24px);
+		}
+
+		/* Impact Display Card */
+		.impact-display {
+			background: rgba(15, 23, 42, 0.6);
+			padding: 2.5rem 2rem;
+			border-radius: 16px;
+			border: 1px solid rgba(255, 255, 255, 0.05);
+			text-align: center;
+		}
+
+		.impact-number {
+			font-size: 3.5rem;
+			font-weight: 800;
+			color: var(--accent-green);
+			margin-bottom: 0.25rem;
+			transition: all 0.3s ease;
+		}
+
+		.impact-unit {
+			font-size: 0.9rem;
+			color: var(--text-muted);
+			text-transform: uppercase;
+			letter-spacing: 1px;
+			margin-bottom: 2rem;
+		}
+
+		.impact-submetric {
+			border-top: 1px solid #334155;
+			padding-top: 1.5rem;
+		}
+
+		.submetric-val {
+			font-size: 1.8rem;
+			font-weight: 700;
+			color: var(--accent-blue);
+		}
+
+		/* Pillars Grid */
+		.grid-heading {
+			font-size: 2rem;
+			font-weight: 700;
+			margin-bottom: 2rem;
+		}
+
+		.pillars-grid {
+			display: flex;
+			flex-wrap: wrap;
+			justify-content: center;
+			gap: 2.5rem;
+		}
+
+		/* Interactive 3D Cards */
+		.card-wrapper {
+			perspective: 1000px;
+		}
+
+		.pillar-card {
+			background: var(--card-bg);
+			border: 1px solid rgba(255, 255, 255, 0.05);
+			border-radius: 20px;
+			width: 340px;
+			padding: 2.5rem 2rem;
+			box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+			transform-style: preserve-3d;
+			transition: transform 0.1s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+			text-align: left;
+			height: 100%;
+		}
+
+		.pillar-card:hover {
+			box-shadow: 0 0 30px var(--accent-glow);
+			border-color: var(--accent-green);
+		}
+
+		.card-icon {
+			width: 50px;
+			height: 50px;
+			border-radius: 12px;
+			background: rgba(16, 185, 129, 0.1);
+			color: var(--accent-green);
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			font-size: 1.5rem;
+			font-weight: bold;
+			margin-bottom: 1.5rem;
+			transform: translateZ(30px);
+			border: 1px solid rgba(16, 185, 129, 0.2);
+		}
+
+		.card-title {
+			font-size: 1.4rem;
+			font-weight: 700;
+			margin-bottom: 1rem;
+			color: #ffffff;
+			transform: translateZ(25px);
+		}
+
+		.card-body {
+			color: var(--text-muted);
+			font-size: 0.95rem;
+			line-height: 1.6;
+			transform: translateZ(15px);
+		}
+	</style>
+</head>
+<body>
+
+	<canvas id="bg-canvas"></canvas>
+
+	<div class="container">
+		<header>
+			<h1>Turning Intent Into Action</h1>
+			<p>Overcoming systemic carelessness inside cities doesn't require rewriting urban planning overnight. It depends on transforming our micro-habits into collective, measurable impacts.</p>
+		</header>
+
+		<div class="dashboard-section">
+			<div class="dashboard-title">
+				<span>🧮</span> Micro-Action Impact Calculator
+			</div>
+			
+			<div class="calculator-grid">
+				<div>
+					<h3 class="metrics-title">Quantify Your Shift</h3>
+					<p class="metrics-desc">Toggle the habits below to compute the resource metrics you can prevent from adding to the urban baseline degradation every single year.</p>
+					
+					<div class="toggle-container">
+						<div class="toggle-row">
+							<div class="toggle-label">
+								<h4>AC Temperature Calibration</h4>
+								<p>Keep air conditioners adjusted at 24°C instead of 18°C</p>
+							</div>
+							<label class="switch">
+								<input type="checkbox" id="toggle-ac" onchange="calculateImpact()">
+								<span class="slider"></span>
+							</label>
+						</div>
+						
+						<div class="toggle-row">
+							<div class="toggle-label">
+								<h4>Smart Public Commute</h4>
+								<p>Opt for localized mass transit or cycling 3 days a week</p>
+							</div>
+							<label class="switch">
+								<input type="checkbox" id="toggle-transit" onchange="calculateImpact()">
+								<span class="slider"></span>
+							</label>
+						</div>
+
+						<div class="toggle-row">
+							<div class="toggle-label">
+								<h4>Zero-Waste Segregation</h4>
+								<p>Compost organic scraps and rigorously separate packaging</p>
+							</div>
+							<label class="switch">
+								<input type="checkbox" id="toggle-waste" onchange="calculateImpact()">
+								<span class="slider"></span>
+							</label>
+						</div>
+					</div>
+				</div>
+
+				<div class="impact-display">
+					<div class="impact-number" id="co2-val">0</div>
+					<div class="impact-unit">KG Carbon saved / Year</div>
+					
+					<div class="impact-submetric">
+						<div class="submetric-val" id="water-val">0</div>
+						<div class="impact-unit" style="margin-bottom: 0;">Liters Water saved / Year</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<h2 class="grid-heading">Strategic Individual Directives</h2>
+		<div class="pillars-grid">
+			
+			<div class="card-wrapper">
+				<div class="pillar-card">
+					<div class="card-icon">⚡</div>
+					<h3 class="card-title">Regulate Micro-Grids</h3>
+					<p class="card-body">Unplug passive phantom-load electronics. Switch residential setups to high-efficiency LED lights and support local neighborhood community energy audits to minimize thermal spikes across your localized grid.</p>
+				</div>
+			</div>
+
+			<div class="card-wrapper">
+				<div class="pillar-card">
+					<div class="card-icon">💧</div>
+					<h3 class="card-title">Arrest Runoff Water</h3>
+					<p class="card-body">Deploy basic aerators onto standard household taps to cut volumetric usage by 50%. Where possible, support rain-catchment barrels to trap storm runoff before it flushes down city drains.</p>
+				</div>
+			</div>
+
+			<div class="card-wrapper">
+				<div class="pillar-card">
+					<div class="card-icon">🌲</div>
+					<h3 class="card-title">Re-Green Balconies</h3>
+					<p class="card-body">Incorporate dense localized potted plants on terrace walls and windowsills. Cultivating mini green spaces breaks up modern concrete surfaces, optimizing regional air filtration processes.</p>
+				</div>
+			</div>
+
+		</div>
+	</div>
+
+	<script>
+		/* --- Interaction 1: Real-Time Impact Accumulator Script --- */
+		function calculateImpact() {
+			let totalCo2 = 0;
+			let totalWater = 0;
+
+			if (document.getElementById('toggle-ac').checked) {
+				totalCo2 += 220;
+				totalWater += 0;
+			}
+			if (document.getElementById('toggle-transit').checked) {
+				totalCo2 += 480;
+				totalWater += 0;
+			}
+			if (document.getElementById('toggle-waste').checked) {
+				totalCo2 += 90;
+				totalWater += 1400;
+			}
+
+			// Smooth numerical tracking update
+			animateValue('co2-val', totalCo2);
+			animateValue('water-val', totalWater);
+		}
+
+		function animateValue(id, target) {
+			const obj = document.getElementById(id);
+			let current = parseInt(obj.innerText) || 0;
+			if (current === target) return;
+			
+			const duration = 400; 
+			const startTimestamp = performance.now();
+			const startValue = current;
+
+			function step(timestamp) {
+				if (!startTimestamp) startTimestamp = timestamp;
+				const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+				obj.innerText = Math.floor(progress * (target - startValue) + startValue);
+				if (progress < 1) {
+					window.requestAnimationFrame(step);
+				} else {
+					obj.innerText = target;
+				}
+			}
+			window.requestAnimationFrame(step);
+		}
+
+		/* --- Interaction 2: Dynamic Particle Background --- */
+		const canvas = document.getElementById('bg-canvas');
+		const ctx = canvas.getContext('2d');
+
+		let width = canvas.width = window.innerWidth;
+		let height = canvas.height = window.innerHeight;
+
+		const particles = [];
+		const mouse = { x: null, y: null, radius: 160 };
+
+		window.addEventListener('resize', () => {
+			width = canvas.width = window.innerWidth;
+			height = canvas.height = window.innerHeight;
+		});
+
+		window.addEventListener('mousemove', (e) => {
+			mouse.x = e.clientX;
+			mouse.y = e.clientY;
+		});
+
+		window.addEventListener('mouseleave', () => {
+			mouse.x = null;
+			mouse.y = null;
+		});
+
+		class Particle {
+			constructor() {
+				this.x = Math.random() * width;
+				this.y = Math.random() * height;
+				this.vx = (Math.random() - 0.5) * 0.5;
+				this.vy = (Math.random() - 0.5) * 0.5;
+				this.radius = Math.random() * 2 + 1;
+			}
+			update() {
+				this.x += this.vx;
+				this.y += this.vy;
+
+				if (this.x < 0 || this.x > width) this.vx *= -1;
+				if (this.y < 0 || this.y > height) this.vy *= -1;
+
+				if (mouse.x && mouse.y) {
+					const dx = mouse.x - this.x;
+					const dy = mouse.y - this.y;
+					const dist = Math.sqrt(dx * dx + dy * dy);
+					if (dist < mouse.radius) {
+						const force = (mouse.radius - dist) / mouse.radius;
+						this.x -= (dx / dist) * force * 2.5;
+						this.y -= (dy / dist) * force * 2.5;
+					}
+				}
+			}
+			draw() {
+				ctx.beginPath();
+				ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+				ctx.fillStyle = 'rgba(16, 185, 129, 0.2)';
+				ctx.fill();
+			}
+		}
+
+		for (let i = 0; i < 80; i++) {
+			particles.push(new Particle());
+		}
+
+		function animate() {
+			ctx.clearRect(0, 0, width, height);
+			particles.forEach(p => {
+				p.update();
+				p.draw();
+			});
+			
+			for (let i = 0; i < particles.length; i++) {
+				for (let j = i + 1; j < particles.length; j++) {
+					const dx = particles[i].x - particles[j].x;
+					const dy = particles[i].y - particles[j].y;
+					const dist = Math.sqrt(dx * dx + dy * dy);
+					if (dist < 110) {
+						ctx.beginPath();
+						ctx.moveTo(particles[i].x, particles[i].y);
+						ctx.lineTo(particles[j].x, particles[j].y);
+						ctx.strokeStyle = `rgba(16, 185, 129, ${0.12 * (1 - dist / 110)})`;
+						ctx.lineWidth = 0.7;
+						ctx.stroke();
+					}
+				}
+			}
+			requestAnimationFrame(animate);
+		}
+		animate();
+
+		/* --- Interaction 3: 3D Tilt Effect on Grid Cards --- */
+		const cards = document.querySelectorAll('.pillar-card');
+		cards.forEach(card => {
+			card.addEventListener('mousemove', (e) => {
+				const rect = card.getBoundingClientRect();
+				const x = e.clientX - rect.left - rect.width / 2;
+				const y = e.clientY - rect.top - rect.height / 2;
+				
+				const rotateX = -(y / rect.height) * 12; 
+				const rotateY = (x / rect.width) * 12;
+				
+				card.style.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+			});
+
+			card.addEventListener('mouseleave', () => {
+				card.style.transform = 'rotateX(0deg) rotateY(0deg)';
+			});
+		});
+	</script>
+</body>
+</html>

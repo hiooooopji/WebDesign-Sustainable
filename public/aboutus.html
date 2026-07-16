@@ -1,0 +1,442 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>About Us | Eco-Tech Team</title>
+    <style>
+      :root {
+        --bg-dark: #0f172a;
+        --card-bg: #1e293b;
+        --accent-green: #10b981;
+        --accent-glow: rgba(16, 185, 129, 0.2);
+        --text-main: #f8fafc;
+        --text-muted: #94a3b8;
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      }
+
+      body {
+        background-color: var(--bg-dark);
+        color: var(--text-main);
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        overflow-x: hidden;
+        position: relative;
+      }
+
+      /* Interactive Canvas Background */
+      #bg-canvas {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 1;
+        pointer-events: none;
+      }
+
+      .container {
+        position: relative;
+        z-index: 2;
+        width: 100%;
+        max-width: 1100px;
+        padding: 2rem;
+        text-align: center;
+      }
+
+      header h1 {
+        font-size: 2.8rem;
+        font-weight: 800;
+        margin-bottom: 0.5rem;
+        background: linear-gradient(to right, #ffffff, var(--accent-green));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+      }
+
+      header p {
+        color: var(--text-muted);
+        font-size: 1.1rem;
+        margin-bottom: 3rem;
+      }
+
+      .team-grid {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 2.5rem;
+      }
+
+      /* Interactive 3D Card */
+      .card-wrapper {
+        perspective: 1000px;
+      }
+
+      .member-card {
+        background: var(--card-bg);
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        border-radius: 20px;
+        width: 340px;
+        padding: 2.5rem 2rem;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        transform-style: preserve-3d;
+        transition:
+          transform 0.1s ease,
+          box-shadow 0.3s ease;
+        cursor: pointer;
+        position: relative;
+      }
+
+      .member-card:hover {
+        box-shadow: 0 0 30px var(--accent-glow);
+        border-color: var(--accent-green);
+      }
+
+      .profile-avatar {
+        width: 100px;
+        height: 100px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #334155, #475569);
+        margin: 0 auto 1.5rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2.5rem;
+        font-weight: bold;
+        color: var(--accent-green);
+        border: 3px solid rgba(16, 185, 129, 0.3);
+        transform: translateZ(30px);
+      }
+
+      .member-name {
+        font-size: 1.6rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+        transform: translateZ(25px);
+      }
+
+      .member-tag {
+        display: inline-block;
+        background: rgba(16, 185, 129, 0.1);
+        color: var(--accent-green);
+        padding: 0.25rem 0.75rem;
+        border-radius: 9999px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        margin-bottom: 1.5rem;
+        transform: translateZ(20px);
+      }
+
+      .stats-box {
+        background: rgba(15, 23, 42, 0.4);
+        border-radius: 12px;
+        padding: 1rem;
+        text-align: left;
+        margin-bottom: 1.5rem;
+        transform: translateZ(15px);
+      }
+
+      .stat-line {
+        font-size: 0.95rem;
+        margin-bottom: 0.5rem;
+        color: var(--text-muted);
+      }
+
+      .stat-line:last-child {
+        margin-bottom: 0;
+      }
+
+      .stat-line strong {
+        color: var(--text-main);
+      }
+
+      /* Interactive Skill Drawer */
+      .interactive-trigger {
+        background: none;
+        border: 2px solid rgba(255, 255, 255, 0.1);
+        color: var(--text-main);
+        padding: 0.6rem 1.2rem;
+        border-radius: 10px;
+        font-weight: 600;
+        cursor: pointer;
+        width: 100%;
+        transition: all 0.3s ease;
+        transform: translateZ(20px);
+      }
+
+      .member-card:hover .interactive-trigger {
+        border-color: var(--accent-green);
+        background: var(--accent-green);
+        color: var(--bg-dark);
+      }
+
+      .skills-pane {
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        text-align: left;
+        margin-top: 0;
+      }
+
+      .skills-pane.active {
+        max-height: 150px;
+        margin-top: 1.5rem;
+      }
+
+      .skill-bar-wrapper {
+        margin-bottom: 0.8rem;
+      }
+
+      .skill-label {
+        font-size: 0.85rem;
+        color: var(--text-muted);
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 0.25rem;
+      }
+
+      .skill-track {
+        height: 6px;
+        background: #334155;
+        border-radius: 3px;
+        overflow: hidden;
+      }
+
+      .skill-fill {
+        height: 100%;
+        background: var(--accent-green);
+        width: 0%;
+        transition: width 1s ease-out;
+      }
+    </style>
+  </head>
+  <body>
+    <canvas id="bg-canvas"></canvas>
+
+    <div class="container">
+      <header>
+        <h1>Meet Our Team</h1>
+        <p>Innovators from NPS Sarjapur shaping a sustainable future</p>
+      </header>
+
+      <div class="team-grid">
+        <!-- Taksheel's Card -->
+        <div class="card-wrapper">
+          <div class="member-card" onclick="toggleSkills(this, 'taksheel')">
+            <div class="profile-avatar">T</div>
+            <h2 class="member-name">Taksheel</h2>
+            <span class="member-tag">Developer / Designer</span>
+            <div class="stats-box">
+              <div class="stat-line">
+                <strong>Age Group:</strong> 15-16 years
+              </div>
+              <div class="stat-line"><strong>School:</strong> NPS Sarjapur</div>
+              <div class="stat-line">
+                <strong>Focus:</strong> Logic & UI Architecture
+              </div>
+            </div>
+            <button class="interactive-trigger">View Skill Analytics</button>
+
+            <div class="skills-pane">
+              <div class="skill-bar-wrapper">
+                <div class="skill-label">
+                  <span>Web Design</span><span>90%</span>
+                </div>
+                <div class="skill-track">
+                  <div class="skill-fill" data-percent="90%"></div>
+                </div>
+              </div>
+              <div class="skill-bar-wrapper">
+                <div class="skill-label">
+                  <span>Sustainability Tech</span><span>85%</span>
+                </div>
+                <div class="skill-track">
+                  <div class="skill-fill" data-percent="85%"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Siddharth's Card -->
+        <div class="card-wrapper">
+          <div class="member-card" onclick="toggleSkills(this, 'siddharth')">
+            <div class="profile-avatar">S</div>
+            <h2 class="member-name">Siddharth</h2>
+            <span class="member-tag">Developer / Systems Architect</span>
+            <div class="stats-box">
+              <div class="stat-line">
+                <strong>Age Group:</strong> 15-16 years
+              </div>
+              <div class="stat-line"><strong>School:</strong> NPS Sarjapur</div>
+              <div class="stat-line">
+                <strong>Focus:</strong> Scripting & Core Mechanics
+              </div>
+            </div>
+            <button class="interactive-trigger">View Skill Analytics</button>
+
+            <div class="skills-pane">
+              <div class="skill-bar-wrapper">
+                <div class="skill-label">
+                  <span>Interactive Scripting</span><span>95%</span>
+                </div>
+                <div class="skill-track">
+                  <div class="skill-fill" data-percent="95%"></div>
+                </div>
+              </div>
+              <div class="skill-bar-wrapper">
+                <div class="skill-label">
+                  <span>Automation Systems</span><span>88%</span>
+                </div>
+                <div class="skill-track">
+                  <div class="skill-fill" data-percent="88%"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      /* --- Interaction 1: Dynamic Particle Background --- */
+      const canvas = document.getElementById("bg-canvas");
+      const ctx = canvas.getContext("2d");
+
+      let width = (canvas.width = window.innerWidth);
+      let height = (canvas.height = window.innerHeight);
+
+      const particles = [];
+      const mouse = { x: null, y: null, radius: 150 };
+
+      window.addEventListener("resize", () => {
+        width = canvas.width = window.innerWidth;
+        height = canvas.height = window.innerHeight;
+      });
+
+      window.addEventListener("mousemove", (e) => {
+        mouse.x = e.clientX;
+        mouse.y = e.clientY;
+      });
+
+      window.addEventListener("mouseleave", () => {
+        mouse.x = null;
+        mouse.y = null;
+      });
+
+      class Particle {
+        constructor() {
+          this.x = Math.random() * width;
+          this.y = Math.random() * height;
+          this.vx = (Math.random() - 0.5) * 0.6;
+          this.vy = (Math.random() - 0.5) * 0.6;
+          this.radius = Math.random() * 2 + 1;
+        }
+        update() {
+          this.x += this.vx;
+          this.y += this.vy;
+
+          if (this.x < 0 || this.x > width) this.vx *= -1;
+          if (this.y < 0 || this.y > height) this.vy *= -1;
+
+          if (mouse.x && mouse.y) {
+            const dx = mouse.x - this.x;
+            const dy = mouse.y - this.y;
+            const dist = Math.sqrt(dx * dx + dy * dy);
+            if (dist < mouse.radius) {
+              const force = (mouse.radius - dist) / mouse.radius;
+              this.x -= (dx / dist) * force * 2;
+              this.y -= (dy / dist) * force * 2;
+            }
+          }
+        }
+        draw() {
+          ctx.beginPath();
+          ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+          ctx.fillStyle = "rgba(16, 185, 129, 0.25)";
+          ctx.fill();
+        }
+      }
+
+      for (let i = 0; i < 75; i++) {
+        particles.push(new Particle());
+      }
+
+      function animate() {
+        ctx.clearRect(0, 0, width, height);
+        particles.forEach((p) => {
+          p.update();
+          p.draw();
+        });
+
+        // Connect nearby particles
+        for (let i = 0; i < particles.length; i++) {
+          for (let j = i + 1; j < particles.length; j++) {
+            const dx = particles[i].x - particles[j].x;
+            const dy = particles[i].y - particles[j].y;
+            const dist = Math.sqrt(dx * dx + dy * dy);
+            if (dist < 100) {
+              ctx.beginPath();
+              ctx.moveTo(particles[i].x, particles[i].y);
+              ctx.lineTo(particles[j].x, particles[j].y);
+              ctx.strokeStyle = `rgba(16, 185, 129, ${0.15 * (1 - dist / 100)})`;
+              ctx.lineWidth = 0.8;
+              ctx.stroke();
+            }
+          }
+        }
+        requestAnimationFrame(animate);
+      }
+      animate();
+
+      /* --- Interaction 2: 3D Tilt Effect on Cards --- */
+      const cards = document.querySelectorAll(".member-card");
+      cards.forEach((card) => {
+        card.addEventListener("mousemove", (e) => {
+          const rect = card.getBoundingClientRect();
+          const x = e.clientX - rect.left - rect.width / 2;
+          const y = e.clientY - rect.top - rect.height / 2;
+
+          // Calculate rotation scaling mapping
+          const rotateX = -(y / rect.height) * 15;
+          const rotateY = (x / rect.width) * 15;
+
+          card.style.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+        });
+
+        card.addEventListener("mouseleave", () => {
+          card.style.transform = "rotateX(0deg) rotateY(0deg)";
+        });
+      });
+
+      /* --- Interaction 3: Skill Panel Expanding Toggle --- */
+      function toggleSkills(card, name) {
+        const pane = card.querySelector(".skills-pane");
+        const fills = card.querySelectorAll(".skill-fill");
+        const button = card.querySelector(".interactive-trigger");
+
+        pane.classList.toggle("active");
+
+        if (pane.classList.contains("active")) {
+          button.innerText = "Hide Analytics";
+          fills.forEach((fill) => {
+            fill.style.width = fill.getAttribute("data-percent");
+          });
+        } else {
+          button.innerText = "View Skill Analytics";
+          fills.forEach((fill) => {
+            fill.style.width = "0%";
+          });
+        }
+      }
+    </script>
+  </body>
+</html>
