@@ -1,13 +1,12 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import Globe from "./globe";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import ExploreWorld from "./ExploreWorld";
 
 export default function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<Globe />} />
-        <Route path="/explore-world" element={<ExploreWorld />} />
+        <Route path="/" element={<ExploreWorld />} />
+        <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </BrowserRouter>
   );
