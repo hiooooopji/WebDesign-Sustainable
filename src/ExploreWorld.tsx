@@ -72,9 +72,9 @@ export default function ExploreWorld() {
     for (let i = 0; i < STAR_COUNT; i++) {
       const sz = 4 + Math.random() * 6;
       const a = 0.5 + Math.random() * 0.5;
-      const [r, g, b] = STAR_RGB[i % STAR_RGB.length];
+      const [cr, cg, cb] = STAR_RGB[i % STAR_RGB.length];
       const el = document.createElement("div");
-      el.style.cssText = `width:szpx;height:szpx;border-radius:50%;pointer-events:none;background:rgba(r,g,b,a);box-shadow:0 0 ${sz*2}px rgba(r,g,b,a),0 0 ${sz*6}px rgba(r,g,b,${a*.6}),0 0 ${sz*14}px rgba(r,g,b,${a*.2});`;
+      el.style.cssText = `width:${sz}px;height:${sz}px;border-radius:50%;pointer-events:none;background:rgba(${cr},${cg},${cb},${a});box-shadow:0 0 ${sz*2}px rgba(${cr},${cg},${cb},${a}),0 0 ${sz*6}px rgba(${cr},${cg},${cb},${a*.6}),0 0 ${sz*14}px rgba(${cr},${cg},${cb},${a*.2});`;
       const obj = new CSS3DObject(el);
       obj.position.set(...spherePos(900 + Math.random() * 2000));
       scene.add(obj);
