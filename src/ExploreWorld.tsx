@@ -81,7 +81,7 @@ export default function ExploreWorld() {
       stars.push({ el, ph: Math.random() * 6.28, sp: Math.random() * 2 + 0.5 });
     }
 
-    const GM = "radial-gradient(circle,rgba(0,0,0,1) 15%,rgba(0,0,0,0.5) 40%,transparent 65%)";
+
     const floor = makeObj(
       `width:4000px;height:4000px;background-image:linear-gradient(rgba(16,185,129,0.06) 1px,transparent 1px),linear-gradient(90deg,rgba(16,185,129,0.06) 1px,transparent 1px);background-size:80px 80px;mask-image:GM;-webkit-mask-image:GM;`,
       [0, -320, 0]
